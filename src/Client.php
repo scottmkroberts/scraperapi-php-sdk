@@ -2,6 +2,8 @@
 namespace ScraperAPI {
   require_once 'mashape/unirest-php/src/Unirest.php';
   use Unirest;
+  use Unirest\Exception;
+  
   class Client
   {
     public $api_key;
@@ -45,19 +47,16 @@ namespace ScraperAPI {
     {
 
 
-      $headers = $options['headers'] ?: [];
-      $country_code = $options['country_code'];
-      $device_type = $options['device_type'];
-      $premium = $options['premium'] ?: false;
-      $render = $options['render'] ?: false;
-      $session_number = $options['session_number'];
-      $autoparse = $options['autoparse'] ?: false;
-      $retry = $options['retry'] ?: 3;
-      $timeout = $options['timeout'] ?: 60;
+      $headers = $options['headers'] ?? [];
+      $country_code = $options['country_code'] ?? '';
+      $premium = $options['premium'] ?? false;
+      $render = $options['render'] ?? false;
+      $session_number = $options['session_number'] ?? '';
+      $autoparse = $options['autoparse'] ?? false;
+      $retry = $options['retry'] ?? 3;
+      $timeout = $options['timeout'] ?? 60;
 
-      $query = array(
-        "country_code" => $country_code,
-        "$device_type" => $device_type,
+      $query = array("country_code" => $country_code,
         "api_key" => $this->api_key,
         "premium" => $premium,
         "render" => $render,
@@ -103,14 +102,14 @@ namespace ScraperAPI {
     try {
       $response = $makeRequest();
       if ($response->code >= 500) {
-        throw new Exception('Could not reach ScraperAPI Proxy');
+        throw new \Exception('Could not reach ScraperAPI Proxy');
       }
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
       if ($try < $max) {
         sleep(1);
         $response = retryRequest($try + 1, $makeRequest, $max);
       } else {
-        throw new Exception('Failed to connect after ' . $max . ' attempts');
+        throw new \Exception('Failed to connect after ' . $max . ' attempts');
       }
     }
 
